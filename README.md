@@ -1,4 +1,21 @@
 Working with Python3.11 so far.
+# Testing setup 
+```
+git clone 
+cd DataDrivenEMSDispatch/Dashboard
+source ./setenv.sh
+
+# docker (you might need to install docker-desktop for mac)
+cd docker
+docker-compose up
+# connect to mongo in mongo compass mongodb://localhost:27017
+# add a database named: fire_department and collection: geo_incidents
+# upload the sample fire data there.
+
+python run.py
+
+# go to localhost:5000
+```
 
 # Integrated Safety Incident Forecasting Analysis and Emergency Resources Dispatch Optimization
 

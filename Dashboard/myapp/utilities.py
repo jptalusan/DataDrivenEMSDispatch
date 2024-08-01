@@ -2,11 +2,11 @@ from __future__ import division
 #python file to store generic methods
 from math import floor
 import fiona
-import ConfigParser
+import configparser
 import numpy as np
 import os
 from pymongo import MongoClient
-from myconfig import MONGODB_HOST, MONGODB_PORT
+from myapp.myconfig import MONGODB_HOST, MONGODB_PORT
 from datetime import datetime
 from datetime import timedelta
 from pyproj import Proj
@@ -33,7 +33,7 @@ incidentCategorization= {
 }
 
 
-Config = ConfigParser.ConfigParser()
+Config = configparser.ConfigParser()
 Config.read("params.conf")
 
 def ConfigSectionMap(Config, section):
@@ -97,7 +97,7 @@ class utilities:
                 if category in self.categoryWiseData.keys():
                     categoryWiseData[category].append(row)
 
-            print "Category wise data segregated"
+            print("Category wise data segregated")
             # category wise data populated, calculate inter-arrival times
             for category in categoryWiseData.keys():
                 # sort arrival data according to time
@@ -138,7 +138,7 @@ class utilities:
         self.lastUpdateDate = datetime.now()
 
     def calculateCategoryWiseSurvival(self):
-        print "Calculating category wise models"
+        print("Calculating category wise models")
         self.lastUpdateDate = datetime(2010,1,1)#arbitrary date before start time
         self.categoryWiseData = {"Cardiac":[],"Trauma":[],"MVA":[],"Fire":[]}
         self.categoryWiseMean = {"Cardiac":0,"Trauma":0,"MVA":0,"Fire":0}
@@ -152,7 +152,7 @@ class utilities:
             if category in self.categoryWiseData.keys():
                 self.categoryWiseData[category].append(row)
 
-        print "Category wise data segregated"
+        print("Category wise data segregated")
         #category wise data populated, calculate inter-arrival times
         for category in self.categoryWiseData.keys():
             #sort arrival data according to time
@@ -220,7 +220,7 @@ class utilities:
                         incidents.append(grid)
 
                 self.categoryWiseGrids[category].append(incidents)
-        print "Created predictions for Heat Map"
+        print("Created predictions for Heat Map")
 
 
     def createIncidentChains(self):
@@ -237,11 +237,12 @@ class utilities:
                         self.times.append([sample,grid])
                         t+=sample
         self.times = sorted(self.times,key=itemgetter(0))
-        print "generated static samples"
+        print("generated static samples")
 
 
     def getGrid(self):
-        shpFilePath =  os.getcwd() + "/myapp/data/StatePlane_Income_Pop_House.shp"
+        print(os.getcwd())
+        shpFilePath =  "/myapp/data/StatePlane_Income_Pop_House.shp"
         fshp = fiona.open(shpFilePath)
         bounds = fshp.bounds
         print(bounds)
@@ -310,7 +311,7 @@ class utilities:
             items = db.find({"$and": [{"served": {'$ne': 'true'}},
                                       {"alarmDateTime": {'$gt': upperDate}}]})
 
-        print "Items that match date : {}".format(items.count())
+        print("Items that match date : {}".format(items.count()))
         self.gridWiseIncidents = {}
         tempData = []
 
@@ -346,7 +347,7 @@ class utilities:
             items = db.find({"$and": [{"served": {'$ne': 'true'}},
                                       {"alarmDateTime": {'$lt': self.lastUpdateDate}}]})
 
-        print "Items that match date : {}".format(items.count())
+        print("Items that match date : {}".format(items.count()))
         self.gridWiseIncidents = {}
         self.data = []
 
@@ -421,7 +422,7 @@ class utilities:
 
     def getNumberOfServersPerDepot(self):
         depot_cache = []
-        print "-> getDepotsData()\n"
+        print("-> getDepotsData()\n")
 
         client = MongoClient(url_mongo_fire_depart)
         # db = client["fire_department"]["depot_details"]
@@ -440,7 +441,7 @@ class utilities:
             else:
                 self.vehiclesInDepot[depotGrid] = len(items[counter]['vehicle'])
 
-        print "Calculated Servers per Depot"
+        print("Calculated Servers per Depot")
 
     def dist(self,i, j):
         try:
@@ -483,13 +484,13 @@ class utilities:
                     self.gridAssignment[grid] = bestDepot
                     self.depotAssignedLambda[bestDepot] += self.gridWiseLambda[grid]
 
-        print "Grid to Depot Assignment complete"
+        print("Grid to Depot Assignment complete")
 
     def calculateGridWiseArrivalLambda(self):
-        print "calculating grid wise lambda"
+        print("calculating grid wise lambda")
         self.gridWiseLambda = {}
         for grid, interArrivalTimes in self.gridWiseInterArrival.iteritems():
             lambdaTemp = sum(interArrivalTimes)/len(interArrivalTimes)
             self.gridWiseLambda[grid] = 1/lambdaTemp
 
-        print "Inter-Arrival Rates Calculated"
+        print("Inter-Arrival Rates Calculated")

@@ -30,7 +30,7 @@ class route_segment:
 		array_result = []
 		for route in array_route:
 			route = str(route)
-			print route
+			print(route)
 			results = common_api.db_static_gtfs_trips.find({"route_id": str(route)})
 			for result in results:
 				trip_id = result['trip_id']
@@ -47,7 +47,7 @@ class route_segment:
 					array_result.append(array_coor)
 					break
 				break
-		print len(array_result), len(array_route)
+		print(len(array_result), len(array_route))
 		with open('routes_coors.json', 'w') as fp:
 			json.dump(array_result, fp)
 
@@ -65,7 +65,7 @@ class route_segment:
 			monday = calendar['monday']
 			if start_date<="20161003" and end_date>="20161003" and monday=="1":
 				array_valid_service_id.append(service_id)
-		print "array_valid_service_id:", array_valid_service_id
+		print("array_valid_service_id:", array_valid_service_id)
 
 		result_map = {}
 		trips = common_api.db_static_gtfs_trips.find()
@@ -74,7 +74,7 @@ class route_segment:
 			service_id = trip['service_id']
 			if service_id not in array_valid_service_id:
 				continue
-			print "-> get_trips_for_all_routes_and_headsigns:", count
+			print("-> get_trips_for_all_routes_and_headsigns:", count)
 			count+=1
 			key = trip['route_id']+'|'+trip['trip_headsign']
 			if key in result_map:
@@ -85,7 +85,7 @@ class route_segment:
 		iii=0
 		for key, trips in result_map.iteritems():
 			iii+=1
-			print iii
+			print(iii)
 			array_tripid = []
 			array_departuretime = []
 			map_departuretime_tripid = {}
@@ -156,7 +156,7 @@ class route_segment:
 	def get_predictions_for_trip(self, trip_id):
 		try:
 			url = 'http://127.0.0.1:8000/predict/tripid/'+str(trip_id)
-			# print "url", url
+			# print("url", url)
 			r = requests.get( url )
 			responseJson = r.json()
 			stop_times = responseJson['stops']
@@ -173,7 +173,7 @@ class route_segment:
 				string_prediction+= '<p><span class="stop-label">%d. %s</span><br/><span class="scheduled-label">Scheduled Time: %s</span><span class="prediction-label">Delay: %d min</span></p><hr/>' % (stop_time['stop_sequence'], stop_time['stop_name'].replace('&', '&#38;'), stop_time['arrival_time'][:5], prediction_minute)
 			return {'coordinates': array_coor, 'prediction': string_prediction}
 		except:
-			print "Exception: get_predictions_for_trip"
+			print("Exception: get_predictions_for_trip")
 
 	# TESTING
 	def get_stops_of_trip(self):
@@ -188,7 +188,7 @@ class route_segment:
 				lat = stop['stop_lat']
 				lng = stop['stop_lon']
 				array_coor.append([lat, lng])
-				print '<p><span class="stop-label">%d. %s</span><br/><span class="scheduled-label">Scheduled Time: %s</span><span class="prediction-label">Delay: %d min</span></p><hr/>' % (tpResult['stop_sequence'], stop['stop_name'].replace('&', '&#38;'), tpResult['arrival_time'][:5], random.randrange(0, 3))
+				print('<p><span class="stop-label">%d. %s</span><br/><span class="scheduled-label">Scheduled Time: %s</span><span class="prediction-label">Delay: %d min</span></p><hr/>' % (tpResult['stop_sequence'], stop['stop_name'].replace('&', '&#38;'), tpResult['arrival_time'][:5], random.randrange(0, 3)))
 		return array_coor
 
 	def get_all_shapeids(self):
@@ -213,12 +213,12 @@ class route_segment:
 
 	def get_polylines_for_all_shapeids(self):
 		array_shapeid = self.get_all_shapeids()
-		# print array_shapeid
+		# print(array_shapeid)
 		array_segmentid = []
 		# array_shapeid = ['9781']
 		
 		for shape_id in array_shapeid:
-			print "--> calculating", shape_id, array_shapeid.index(shape_id), len(array_shapeid)
+			print("--> calculating", shape_id, array_shapeid.index(shape_id), len(array_shapeid))
 			check_db = common_api.db_segments_polylines.find_one({"shape_id": shape_id})
 			if check_db:
 				continue
@@ -236,17 +236,17 @@ class route_segment:
 					# 	array_segmentid.append(segment_id)
 					if True:
 						if len(tuple_distance)==2:
-							# print "++++++++++++++++++++++++++++++++++++++   ",tuple_distance
+							# print("++++++++++++++++++++++++++++++++++++++   ",tuple_distance)
 							if array_one_shape[sequence_flag]['shape_dist_traveled']<tuple_distance[0]:
 								new_array_coor = []
 								for i in range(sequence_flag, len(array_one_shape)):
 									sequence_flag = i
 									if array_one_shape[i]['shape_dist_traveled']<tuple_distance[0]:
 										new_array_coor.append([array_one_shape[i]['shape_pt_lat'], array_one_shape[i]['shape_pt_lon']])
-										# print "-- >", array_one_shape[i]['shape_dist_traveled']
+										# print("-- >", array_one_shape[i]['shape_dist_traveled'])
 									else: break
 								
-								# print new_array_coor
+								# print(new_array_coor)
 
 								if len(new_array_coor)>=2: 
 									result_array_segments.append(new_array_coor)
@@ -256,14 +256,14 @@ class route_segment:
 									sequence_flag = i
 									if array_one_shape[i]['shape_dist_traveled']>=tuple_distance[0] and array_one_shape[i]['shape_dist_traveled']<=tuple_distance[1]:
 										new_array_coor.append([array_one_shape[i]['shape_pt_lat'], array_one_shape[i]['shape_pt_lon']])
-										# print "## >", array_one_shape[i]['shape_dist_traveled']
+										# print("## >", array_one_shape[i]['shape_dist_traveled'])
 									else: break
 								
-								# print new_array_coor
+								# print(new_array_coor)
 								if len(new_array_coor)>=2: 
 									result_array_segments.append(new_array_coor)
 			if len(result_array_segments)<2:
-				print " -------------------------------------------------------  ", shape_id
+				print(" -------------------------------------------------------  ", shape_id)
 			common_api.db_segments_polylines.insert({"shape_id": shape_id, "polylines":result_array_segments})
 
 	# def get_shapeids_for_routes(self):
@@ -272,7 +272,7 @@ class route_segment:
 	# 	all_routes = col_gtfs_routes.find()
 	# 	for route in all_routes:
 	# 		array_routeid.append(route['route_id'])
-	# 	print len(array_routeid)
+	# 	print(len(array_routeid))
 	# 	# get a shape for each route
 	# 	array_shapeid = []
 	# 	for route_id in array_routeid:
@@ -295,14 +295,14 @@ class route_segment:
 					if segment not in result_array_segments:
 						result_array_segments.append(segment)
 
-		print len(result_array_segments)
+		print(len(result_array_segments))
 		return result_array_segments
 
 	def get_all_segments(self):
 		result_array_segments = []
 		array_shapeid = self.get_all_shapeids()
 		for shape_id in array_shapeid:
-			# print "--> pulling", shape_id, array_shapeid.index(shape_id), len(array_shapeid)
+			# print("--> pulling", shape_id, array_shapeid.index(shape_id), len(array_shapeid))
 			check_db = common_api.db_segments_polylines.find_one({"shape_id": shape_id})
 			if not check_db:
 				self.get_polylines_for_all_shapeids()
@@ -312,7 +312,7 @@ class route_segment:
 					if segment not in result_array_segments:
 						result_array_segments.append(segment)
 
-		print len(result_array_segments)
+		print(len(result_array_segments))
 		return result_array_segments
 
 # ccc = route_segment()
@@ -320,5 +320,5 @@ class route_segment:
 # get_all_segments()
 # ccc = route_segment()
 # ccc.get_trips_for_all_routes_and_headsigns()
-# print ccc.get_vehicle_location_for_trip("124720", 1464886800)
+# print(ccc.get_vehicle_location_for_trip("124720", 1464886800))
 # ccc.get_polylines_for_all_shapeids()

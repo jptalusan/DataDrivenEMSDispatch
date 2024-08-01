@@ -5,5 +5,5 @@ with open('/Users/wangshibao/SummerProjects/analytics-dashboard/myapp/CrimeHisto
         header = reader.next()
         date_time = "20140501 00:00"
         date_time = datetime.datetime.strptime(date_time, "%Y%m%d %H:%M")
-        print date_time
+        print(date_time)
 

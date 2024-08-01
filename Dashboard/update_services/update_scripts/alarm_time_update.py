@@ -9,7 +9,7 @@ MONGODB_PORT = 27017
 
 
 url_mongo_fire_depart = "%s:%d/fire_department" % (MONGODB_HOST, MONGODB_PORT)
-#print "--> url_mongo_fire_depart:", url_mongo_fire_depart
+#print("--> url_mongo_fire_depart:", url_mongo_fire_depart)
 
 client = MongoClient(url_mongo_fire_depart)
 db = client["fire_department"]["geo_incidents"]

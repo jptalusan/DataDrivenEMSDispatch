@@ -1,7 +1,7 @@
 import time
 import os
 from datetime import datetime
-import ConfigParser
+import configparser
 from myapp.views import utils
 
 # import os,sys,inspect
@@ -11,7 +11,7 @@ from myapp.views import utils
 
 
 
-Config = ConfigParser.ConfigParser()
+Config = configparser.ConfigParser()
 Config.read(os.getcwd()+"/update_services/streamUpdate.conf")
 
 def ConfigSectionMap(Config, section):

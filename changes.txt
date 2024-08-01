@@ -1,0 +1,16 @@
+steps:
+    python 2 to 3
+    change prints
+    removed pip versions
+    docker compose => mongo, no auth
+    mongo compass connect
+    launch.json -> debugging
+    pickle read -> utils = pickle.load(input_file, fix_imports=True, encoding='latin1')
+    incidentsPlot -> google maps to leaflet (for now)
+    ~pymongo credentials if needed (not needed now)
+    mongo db: fire_department, collections: geo_incidents ~# simple_incidents, depot_details, newStations2019,  etc...
+    googlemaps api -> ask David, or change to leaflet for now.
+    
+questions:
+    update_services: Is this to read the raw xml file? so we assume we already have the data in mongo format.
+    socket.emit -> socket.on in js.

@@ -15,7 +15,7 @@ import configparser
 
 CONFIG_FILE = "/home/vol-gpettet/analytics-dashboard/update_services/ingest_config.cfg"
 
-config = configparser.ConfigParser()
+Config = configparser.ConfigParser()
 config.read(CONFIG_FILE)
 
 client = pymongo.MongoClient()
@@ -75,7 +75,7 @@ def walktree(top, callback):
             # It's a file, call the callback function
             callback(pathname)
         else:
-            # Unknown file type, print a message
+            # Unknown file type, print(a message)
             print('Skipping %s' % pathname)
 
 def visitfile(file):

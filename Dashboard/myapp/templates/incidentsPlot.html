@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Alegreya+Sans+SC:100|Shadows+Into+Light|Lato:100i|Zilla+Slab"
           rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
 </head>
 
 <body>
@@ -182,15 +186,31 @@
     </div>
 </div>
 
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script src="https://d3js.org/d3.v4.js"></script>
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="./static/styles.js"></script>
 <script src="./static/globalArrays.js"></script>
 <script src="./static/incidentscode.js"></script>
-
+<!-- 
 <script async defer src=
         "https://maps.googleapis.com/maps/api/js?key=blank&libraries=visualization&callback=initMap">
+</script> -->
+
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+<script src="http://leaflet.github.io/Leaflet.markercluster/example/realworld.10000.js"></script>
+<script>
+
+var map = L.map('map').setView([36.16535143591507, -86.7779297497539], 12);
+
+var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+}).addTo(map);
+
+// addressPoints = addressPoints.map(function (p) { return [p[0], p[1]]; });
+
+// var heat = L.heatLayer(addressPoints).addTo(map);
+
 </script>
 
 <div id="bottomHint">

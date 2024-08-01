@@ -14,9 +14,9 @@ import numpy as np
 import math
 from math import radians, cos, sin, asin, sqrt
 import thread
-from myconfig import MONGODB_HOST, MONGODB_PORT
+from myapp.myconfig import MONGODB_HOST, MONGODB_PORT
 
-print MONGODB_HOST, MONGODB_PORT
+print(MONGODB_HOST, MONGODB_PORT)
 
 class common_api:
 
@@ -78,7 +78,7 @@ class common_api:
 		self.db_segments_polylines = self.db_connection_remote['thub_segments_nashville-mta22020160915']['polylines']
 
 	def convert_nashvilletime_to_timestamp(self, year, month, day, hour, minute, second):
-		# print "%d/%d/%d %d:%d:%d" % (year, month, day, hour, minute, second)
+		# print("%d/%d/%d %d:%d:%d" % (year, month, day, hour, minute, second))
 		tz = pytz.timezone('CST6CDT')
 		dt_with_tz = tz.localize(datetime.datetime(year, month, day, hour, minute, second), is_dst=None)
 		ts = (dt_with_tz - datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)).total_seconds()

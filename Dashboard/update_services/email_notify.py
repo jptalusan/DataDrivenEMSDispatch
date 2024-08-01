@@ -6,7 +6,7 @@ import configparser
 # Constants 
 
 CONFIG_FILE = "/home/vol-gpettet/analytics-dashboard/update_services/ingest_config.cfg"
-config = configparser.ConfigParser()
+Config = configparser.ConfigParser()
 config.read(CONFIG_FILE)
 
 TO = str(config['EMAIL']['to'])
@@ -32,9 +32,9 @@ def send_email_alert(subject, text):
 
     try:
         server.sendmail(GMAIL_SENDER, [TO], BODY)
-        print ('email sent')
+        print(('email sent'))
     except:
-        print ('error sending mail')
+        print(('error sending mail'))
 
     server.quit()
 

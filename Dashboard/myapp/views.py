@@ -18,23 +18,23 @@ from pymongo import MongoClient
 from myapp import app
 from myapp import socketio
 from myapp.utilities import utilities
-from myconfig import MONGODB_HOST, MONGODB_PORT
+from myapp.myconfig import MONGODB_HOST, MONGODB_PORT
 from multiprocessing import Pool
 from math import ceil
 
 
 url_mongo_fire_depart = "%s:%d/fire_department" % (MONGODB_HOST, MONGODB_PORT)
-print "--> url_mongo_fire_depart:", url_mongo_fire_depart
+print("--> url_mongo_fire_depart:", url_mongo_fire_depart)
 
 
 velocity = 2.5
 getSign = lambda num: copysign(1, num)
-utilDumpPath = os.getcwd() + "/utilsDump"
-
+utilDumpPath = "./utilsDump"
+print(utilDumpPath)
 if os.path.isfile(utilDumpPath):
     with open(utilDumpPath, "rb") as input_file:
-        utils = pickle.load(input_file)
-        print "Loaded Utils"
+        utils = pickle.load(input_file, fix_imports=True, encoding='latin1')
+        print("Loaded Utils")
 else:
     utils = utilities()
     with open("utilsDump", "wb") as output_file:
@@ -89,10 +89,10 @@ def getRouteUpdated(gridFrom, gridTo, velocity):
     # sanity check
     try:
         if route[-1][0] != gridTo:
-            print "Error calculating route between grid {} and {}".format(gridFrom, gridTo)
+            print("Error calculating route between grid {} and {}".format(gridFrom, gridTo))
     except IndexError:
         if route[-1][0] != gridTo:
-            # print "Error calculating route between grid {} and {}".format(gridFrom, gridTo)
+            # print("Error calculating route between grid {} and {}".format(gridFrom, gridTo))
             raise Exception("Error calculating route between grid {} and {}".format(gridFrom, gridTo))
 
     return route
@@ -175,7 +175,7 @@ def simulate(responders):
             travelTime, nextTime = dispatchResponder(responders,incidentGrid,t)
             bisect.insort(timesToCheck,nextTime)
             totalWaitTime += travelTime
-    print "Total wait time calculated"
+    print("Total wait time calculated")
     return ceil(totalWaitTime), len(incidents)
 
         # create responders
@@ -231,17 +231,17 @@ def socketio_connet():
 
     '''
     # start: t-hub dashboard
-    print "socketio_connect"
+    print("socketio_connect")
     time_change_simulation()
     data_segments = []
     with open('myapp/cached_shared_segments.json') as data_file:
         data_segments = json.load(data_file)
-    print "data_segments", len(data_segments)
+    print("data_segments", len(data_segments))
     emit('draw_all_route_segments', {'data': data_segments})
     # end: t-hub dashboard
     '''
     
-    print "-> socketio_connect()\n"
+    print("-> socketio_connect()\n")
     emit("success")
 
 @socketio.on('pre_process')
@@ -270,7 +270,7 @@ def getDispatch():
 
     items = db.find({'served': {'$eq': 'False'}})
     # items = db.find({'alarmDateTime': {'$lt': datetime.datetime.now()}})
-    print "Items that match date : {}".format(items.count())
+    print("Items that match date : {}".format(items.count()))
 
     pendingIncidents = []
     # for counterBatch in range(totalBatches):
@@ -358,7 +358,7 @@ def getResponseTime(msg):
     # emit("gotNewResponseTime", [results[0], results[1]])
 
 
-    print "calculating repsonse time"
+    print("calculating repsonse time")
     depotDetails = deepcopy(utils.vehiclesInDepot)
     responders = []
     for key, value in depotDetails.iteritems():
@@ -383,7 +383,7 @@ def getResponseTime(msg):
         vehiclesInDepot = utils.vehiclesInDepot[depotGridOriginal]
         depotDetails.pop(depotGridOriginal)
         if depotGridOriginal != depotGridNew:
-            print "found moved depot"
+            print("found moved depot")
         depotDetails[depotGridNew] = vehiclesInDepot
 
 
@@ -414,13 +414,13 @@ def getResponseTime(msg):
 
 @socketio.on('get_pending')
 def getPending():
-    print "-> getIncidentData()\n"
+    print("-> getIncidentData()\n")
     client = MongoClient(url_mongo_fire_depart)
     db = client["fire_department"]["geo_incidents"]
 
     items = db.find({'served': {'$eq': 'False'}})
     # items = db.find({'alarmDateTime': {'$lt': datetime.datetime.now()}})
-    print "Items that match date : {}".format(items.count())
+    print("Items that match date : {}".format(items.count()))
 
     arr = []
     # for counterBatch in range(totalBatches):
@@ -495,7 +495,7 @@ def getDepots():
 
 @socketio.on('get_date')
 def getDate (msg):
-    print "-> got date, start = " + msg['start'] +", end = "+ msg['end']
+    print("-> got date, start = " + msg['start'] +", end = "+ msg['end'])
     start = datetime.datetime.strptime(msg['start'], "%Y-%m-%d %H:%M")
     end = datetime.datetime.strptime(msg['end'], "%Y-%m-%d %H:%M")
     delta = end - start
@@ -503,7 +503,7 @@ def getDate (msg):
     if (delta > 14):
         arr = getIncidentHeat(start, end)
         # getCrimeData(start, end, "heat")
-        print request.sid
+        print(request.sid)
 
         emit("latlngarrofobj",arr)
         # emit("latlngarrofobj", arr)
@@ -513,7 +513,7 @@ def getDate (msg):
         timeStart = datetime.datetime.now()
         getIncidentData(start, end)
         timeEnd = datetime.datetime.now()
-        print "Time taken to get incidents : {}".format((timeEnd-timeStart).total_seconds())
+        print("Time taken to get incidents : {}".format((timeEnd-timeStart).total_seconds()))
         timeStart = datetime.datetime.now()
         getDepotsData()
         timeEnd = datetime.datetime.now()
@@ -525,10 +525,10 @@ def getDate (msg):
 @socketio.on('predictNOW')
 def getPredict(msg):
     if (msg['ans'] == 'crime'):
-        print "-----> get predict for CRIME"
+        print("-----> get predict for CRIME")
         getPredictions("crime")
     else:
-        print "-----> get predict for FIRE"
+        print("-----> get predict for FIRE")
         getPredictionsByCategory(msg['category'])
         # getPredictions("fire")
 
@@ -555,7 +555,7 @@ def findMinMax():
 #     #     pretime = (items[0])['alarmDateTime']
 #     #     if isinstance(pretime, unicode):
 #     #         pretime = datetime.datetime.strptime(pretime, "%Y,%m,%d,%H,%M,%S,%f")
-#     #         print pretime
+#     #         print(pretime)
 #     #     maxT = pretime
 #     #     minT = pretime
 #
@@ -585,7 +585,7 @@ def findMinMax():
         minmax[1] = (datetime.datetime(2019,6,19) - datetime.datetime(1970,1,1)).total_seconds()
 
         lastsearch = time.time()
-        # print [minT, maxT]
+        # print([minT, maxT])
         emit("gotNewMinMaxTime", minmax)
 
 @socketio.on('getHeat_entire')
@@ -595,7 +595,7 @@ def getHeat_entire():
 
 # retrieve a simplified list of information for just heat map layer
 def getIncidentHeat(start, end):
-    print "-> getIncidentHeat()\n"
+    print("-> getIncidentHeat()\n")
     client = MongoClient(url_mongo_fire_depart)
     db = client["fire_department"]["geo_incidents"]
     #items = db.find()
@@ -610,13 +610,14 @@ def getIncidentHeat(start, end):
         #     else:
         #         _time_ = datetime.datetime.strptime(_time_, "%Y,%m,%d,%H,%M,%S,%f")
         # elif not isinstance(_time_, datetime.date):
-        #     print item
+        #     print(item)
         #
         # if (start <= _time_ <= end):
         dictIn = {}
         dictIn['lat'] = item['latitude']
         dictIn['lng'] = item['longitude']
         dictIn['emdCardNumber'] = item['emdCardNumber']
+        
         arr.append(dictIn)
     #emit("latlngarrofobj", arr)
     return arr
@@ -640,7 +641,7 @@ def createDBDate(dt):
 # retrieve data from mongo db
 def getIncidentData(start, end):
     getDepotsData()
-    print "-> getIncidentData()\n"
+    print("-> getIncidentData()\n")
     client = MongoClient(url_mongo_fire_depart)
     db = client["fire_department"]["geo_incidents"]
 
@@ -648,7 +649,7 @@ def getIncidentData(start, end):
     ############################
     ############################
     # REMOVE BEFORE CHECK IN
-    # print "Debug: remove before check in. Start and end dates modified"
+    # print("Debug: remove before check in. Start and end dates modified")
     # start = datetime.datetime(2011, 1, 1)
     # end = datetime.datetime(2018, 1, 1)
     ############################
@@ -658,7 +659,7 @@ def getIncidentData(start, end):
 
     items = db.find({'alarmDateTime':{'$gte':start,'$lt':end}}).limit(600)
     #items = db.find({'alarmDateTime': {'$lt': datetime.datetime.now()}})
-    print "Items that match date : {}".format(items.count())
+    print("Items that match date : {}".format(items.count()))
 
     arr = []
     #for counterBatch in range(totalBatches):
@@ -726,7 +727,7 @@ depot_cache = [];
 def getDepotsData():
     # global depot_cache
     depot_cache = []
-    print "-> getDepotsData()\n"
+    print("-> getDepotsData()\n")
 
     client = MongoClient(url_mongo_fire_depart)
     #db = client["fire_department"]["depot_details"]
@@ -744,7 +745,7 @@ def getDepotsData():
 
     # count = 0
     # for item in items:
-    #     print "Item"
+    #     print("Item")
     #     ##replaced in query
     #     # if (item['apparatusID']=="sample"):
     #     #     continue
@@ -755,8 +756,8 @@ def getDepotsData():
     #         if stationArr[0] not in depot:
     #             depot.append(stationArr[0])
     #         indexOfthis = depot.index(stationArr[0])
-    #         # print stationArr
-    #         # print indexOfthis
+    #         # print(stationArr)
+    #         # print(indexOfthis)
     #         if not vehiclesInDepot[indexOfthis]:
     #             vehiclesInDepot[indexOfthis] = [];
     #         vehiclesInDepot[indexOfthis].append(item['apparatusID'])
@@ -776,7 +777,7 @@ def getCrimeData(start, end, str):
             date = row[1]
             date_time = datetime.datetime.strptime(date, "%Y%m%d %H:%M")
             if (start <= date_time <= end):
-                # print i
+                # print(i)
                 # i += 1
 
                 obj = {}
@@ -787,10 +788,10 @@ def getCrimeData(start, end, str):
         emit("crime_heat", arr)
     else: 
         if (arr != []):
-            print "-----> arr is NOT empty"
+            print("-----> arr is NOT empty")
             emit("crime_data", arr)
         else:
-            print "-----> arr is empty"
+            print("-----> arr is empty")
             emit("crime_none")
 
 # 
@@ -829,15 +830,15 @@ def getPredictions(type):
     if type == "fire":
         if os.path.isfile(filepath + 'meanTraffic.txt'):
             exists = True
-            print"Found mean file"
+            print("Found mean file")
             with open(filepath+'meanTraffic.txt','r+') as f:
                 mean = float(f.readlines()[0])
         else:
-            print"Did not find mean file"
+            print("Did not find mean file")
             mean = 200
 
         if os.path.isfile(filepath + 'predictionsFireDashboard.pickle'):
-            print"Found fire prediction file"
+            print("Found fire prediction file")
             with open(filepath+'predictionsFireDashboard.pickle','r+') as f:
                 predictionsOutput = pickle.load(f)
 
@@ -854,7 +855,7 @@ def getPredictions(type):
             emit("predictions_data", output)
 
         else:
-            print"Did not find prediction file"
+            print("Did not find prediction file")
             emit("predictions_none", [])
     elif type == "crime":
         if os.path.isfile(filepath + "crimePredicted.xls"):
@@ -876,17 +877,17 @@ def getPredictions(type):
                     try:
                         row.append(predictionWorksheet.cell_value(index, counterCol))
                     except IndexError:
-                        print "Issue with row {} and column {}".format(index,counterCol)
+                        print("Issue with row {} and column {}".format(index,counterCol))
                 output.append(row)
                 numSampled+=1
-            print len(output)
+            print(len(output))
             emit("predictions_data_crime", output)
         else:
-            print"Did not find prediction file"
+            print("Did not find prediction file")
             emit("predictions_none", [])
 
 def getBestDepotPos():
-    print "--> get best bestAssignment of depots"
+    print("--> get best bestAssignment of depots")
     filepath = os.getcwd() + "/myapp/"
 
     arr = []
@@ -897,11 +898,11 @@ def getBestDepotPos():
             if contents[3][i] > 0:
                 arr.append(i)
         for i in range(len(contents[2])):
-            if contents[2][i][0] is not 0:
+            if contents[2][i][0] != 0:
                 if  contents[2][i][0] not in dicOfDepot:
                     dicOfDepot[contents[2][i][0]] = []
                 dicOfDepot[contents[2][i][0]].append(i)
-    # print dicOfDepot
+    # print(dicOfDepot)
 
     
     with open(filepath + "latLongGrids.pickle") as f:
@@ -943,18 +944,18 @@ def time_change_simulation():
     data = r.json()
     if data:        
         current_timestamp = data['timestamp']
-        print "-current_timestamp", current_timestamp
+        print("-current_timestamp", current_timestamp)
         date_time = datetime.datetime.fromtimestamp(current_timestamp, pytz.timezone('America/Chicago'))
         emit('simulated_time', {'timestamp': date_time.strftime("%Y-%m-%d %H:%M")})
 
 # @socketio.on('connect')
 # def socketio_connect():
-    # print "socketio_connect"
+    # print("socketio_connect")
     # time_change_simulation()
     # data_segments = []
     # with open('myapp/cached_shared_segments.json') as data_file:
     #     data_segments = json.load(data_file)
-    # print "data_segments", len(data_segments)
+    # print("data_segments", len(data_segments))
     # emit('draw_all_route_segments', {'data': data_segments})
 
 @socketio.on('get_map_routes')
@@ -965,7 +966,7 @@ def socketio_get_map_routes(message):
         data_segments = []
         with open('myapp/cached_shared_segments.json') as data_file:
             data_segments = json.load(data_file)
-        print "data_segments", len(data_segments)
+        print("data_segments", len(data_segments))
         emit('draw_all_route_segments', {'data': data_segments})
     else:
         data_segments = []
@@ -989,34 +990,34 @@ def socketio_get_map_routes(message):
 
 @socketio.on('get_vehicle_location_for_trip')
 def socketio_get_vehicle_location_for_trip(message):
-    print "socketio_get_vehicle_location_for_trip"
+    print("socketio_get_vehicle_location_for_trip")
     trip_id = message.get('trip_id')
     url = 'http://127.0.0.1:8000/vehicle/'+str(trip_id)
     r = requests.get( url )
     data = r.json()
     # route_segment = dashboard.route_segment()
     # data = route_segment.get_vehicle_location_for_trip(trip_id)
-    print 'vehicle location', data
+    print('vehicle location', data)
     if data[0] != -1:
         emit('vehicle_location_for_trip', {'coordinate': data})
-    print data
+    print(data)
 
 @socketio.on('get_predictions_for_trip')
 def socketio_get_predictions_for_trip(message):
-    print "socketio_get_predictions_for_trip"
+    print("socketio_get_predictions_for_trip")
     trip_id = message.get('trip_id')
     route_segment = dashboard.route_segment()
     data = route_segment.get_predictions_for_trip(trip_id)
     segments = route_segment.get_segments_for_tripid(trip_id)
-    print "trip_id", trip_id
-    print data['coordinates']
+    print("trip_id", trip_id)
+    print(data['coordinates'])
     emit('predictions_for_trip', {'prediction': data['prediction'], 'coordinates': data['coordinates'], 'segments': segments})
 
 @socketio.on('get_all_routeid')
 def socketio_get_all_routeid():
     route_segment = dashboard.route_segment()
     data = route_segment.get_all_routeid()
-    # print "dfasdfasdf:", data
+    # print("dfasdfasdf:", data)
     emit('all_routeid', {'data': data})
 
 @socketio.on('get_directions_for_routeid')
@@ -1024,12 +1025,12 @@ def socketio_get_directions_for_routeid(message):
     route_segment = dashboard.route_segment()
     route_id = message.get('route_id')
     data = route_segment.get_all_headsigns(route_id)
-    print data
+    print(data)
     emit('directions_for_routeid', {'data': data})
 
 @socketio.on('get_trips_for_routeid_direction')
 def socketio_get_trips_for_routeid_direction(message):
-    print 'get_trips_for_routeid_direction'
+    print('get_trips_for_routeid_direction')
     route_segment = dashboard.route_segment()
     route_id = message.get('route_id')
     trip_headsign = message.get('trip_headsign')

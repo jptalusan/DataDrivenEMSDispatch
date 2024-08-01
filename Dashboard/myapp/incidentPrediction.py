@@ -1,11 +1,11 @@
-import ConfigParser
+import configparser
 import pickle
 from datetime import timedelta
 import numpy as np
 from operator import itemgetter
 from pyproj import Proj
 
-Config = ConfigParser.ConfigParser()
+Config = configparser.ConfigParser()
 Config.read("params.conf")
 p1 = Proj(
     '+proj=lcc +lat_1=36.41666666666666 +lat_2=35.25 +lat_0=34.33333333333334 +lon_0=-86 +x_0=600000 +y_0=0 +ellps=GRS80 +datum=NAD83 +no_defs')

@@ -533,7 +533,7 @@ function prepMarkers() {
     }
 
     if (heatmap) {
-        heatmap.setMap(null);
+        heatmap.addTo(null);
     }
 
     if (heatmapPredict) {
@@ -1129,12 +1129,16 @@ socket.on('heat-success', function() {
     // console.log("-->All heat pushed success");
     // console.log("heatDataAll:   "+heatDataAll.length);
     
-    heatmap= new google.maps.visualization.HeatmapLayer({
-        data: heatDataAll,
-        dissipating: false,
-        map: map,
-        radius: 0.01
-    });
+    // heatmap= new google.maps.visualization.HeatmapLayer({
+    //     data: heatDataAll,
+    //     dissipating: false,
+    //     map: map,
+    //     radius: 0.01
+    // });
+    heatmap = L.heatLayer([
+        [36.16535143591507, -86.7779297497539, 0.5],
+        [36.163649865600206, -86.78085883594437, 0.5],
+    ], {radius: 25});
     setBar(sumOfIncidents, "historic");
 
     var arr = [['Types', 'Number']];
@@ -1305,8 +1309,10 @@ socket.on('latlngarrofobj', function(msg) {
     // var o = document.getElementsByClassName("icon-bar");
     // o[0].style.visibility = 'hidden';
     console.log('Received Incident Data');
+    console.log(msg);
     for (var i=0; i<msg.length; i++) {
-        var latLng = new google.maps.LatLng((msg[i]).lat, (msg[i]).lng);
+        // var latLng = new google.maps.LatLng((msg[i]).lat, (msg[i]).lng);
+        var latLng = L.LatLng((msg[i]).lat, (msg[i]).lng);
         heatDataAll.push(latLng);
         var emdCardNumber = (msg[i]).emdCardNumber;
         var protocol;
@@ -1340,7 +1346,7 @@ var heatmap;
 function setHeatMap() {
     // clear old heatmap first
     if (heatmap) {
-        heatmap.setMap(null);
+        heatmap.addTo(null);
     }
     var dataNow = [];
     dataNow.length = 0;
@@ -1351,19 +1357,24 @@ function setHeatMap() {
     }
     // console.log("--------> dataNow length is: "+dataNow.length);
     // console.log(dataNow);
-    heatmap= new google.maps.visualization.HeatmapLayer({
-        data: dataNow,
-        dissipating: false,
-        map: map,
-        radius: 0.01
-    });
+    // heatmap= new google.maps.visualization.HeatmapLayer({
+    //     data: dataNow,
+    //     dissipating: false,
+    //     map: map,
+    //     radius: 0.01
+    // });
+    
+    heatmap = L.heatLayer([
+        [36.16535143591507, -86.7779297497539, 0.5],
+        [36.163649865600206, -86.78085883594437, 0.5],
+    ], {radius: 25});
     document.getElementById("heatHide").style.visibility = "visible";
     document.getElementById("gradient").style.visibility = "visible";
 }
 
 // toggle heat map
 function toggleHeatmap() {
-    heatmap.setMap(heatmap.getMap() ? null : map);
+    heatmap.addTo(heatmap.getMap() ? null : map);
     var gradient = document.getElementById("gradient");
     gradient.style.visibility = (heatmap.getMap() ? "visible" : "hidden");
 }

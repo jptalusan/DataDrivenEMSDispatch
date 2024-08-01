@@ -203,13 +203,18 @@
 
 var map = L.map('map').setView([36.16535143591507, -86.7779297497539], 12);
 
-var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var tiles = L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
+L.marker([50.5, 30.5]).addTo(map);
 // addressPoints = addressPoints.map(function (p) { return [p[0], p[1]]; });
 
 // var heat = L.heatLayer(addressPoints).addTo(map);
+var heat = L.heatLayer([
+	[50.5, 30.5, 1.0], // lat, lng, intensity
+	[50.6, 30.4, 1.0],
+], {radius: 25, minOpacity: 0.9}).addTo(map);
 
 </script>
 

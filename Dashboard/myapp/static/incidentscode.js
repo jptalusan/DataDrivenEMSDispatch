@@ -22,19 +22,21 @@ function initMap() {
     // var loc = window.location.pathname;
     // var dir = loc.substring(0, loc.lastIndexOf('/'));
     // alert(dir);
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 11,
-        center: centerNash,
-        mapTypeId: 'roadmap',
-        scrollwheel: false,  // disable scroll wheel
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: true,
-        fullscreenControlOptions: {
-          position: google.maps.ControlPosition.LEFT_BOTTOM
-        },
-        styles: oldStyles
-    });
+    // map = new google.maps.Map(document.getElementById('map'), {
+    //     zoom: 11,
+    //     center: centerNash,
+    //     mapTypeId: 'roadmap',
+    //     scrollwheel: false,  // disable scroll wheel
+    //     mapTypeControl: false,
+    //     streetViewControl: false,
+    //     fullscreenControl: true,
+    //     fullscreenControlOptions: {
+    //       position: google.maps.ControlPosition.LEFT_BOTTOM
+    //     },
+    //     styles: oldStyles
+    // });
+    map = L.map('map').setView([36.16535143591507, -86.7779297497539], 12);
+
 
     //sample geojson defined only for test purposes
 
@@ -1135,10 +1137,9 @@ socket.on('heat-success', function() {
     //     map: map,
     //     radius: 0.01
     // });
-    heatmap = L.heatLayer([
-        [36.16535143591507, -86.7779297497539, 0.5],
-        [36.163649865600206, -86.78085883594437, 0.5],
-    ], {radius: 25});
+    console.log(heatDataAll);
+    heatmap = L.heatLayer(heatDataAll, {radius: 25, minOpacity: 0.1});
+    heatmap.addTo(map);
     setBar(sumOfIncidents, "historic");
 
     var arr = [['Types', 'Number']];
@@ -1312,8 +1313,8 @@ socket.on('latlngarrofobj', function(msg) {
     console.log(msg);
     for (var i=0; i<msg.length; i++) {
         // var latLng = new google.maps.LatLng((msg[i]).lat, (msg[i]).lng);
-        var latLng = L.LatLng((msg[i]).lat, (msg[i]).lng);
-        heatDataAll.push(latLng);
+        // var latLng = L.LatLng((msg[i]).lat, (msg[i]).lng);
+        heatDataAll.push([(msg[i]).lat, (msg[i]).lng, 0.1]);
         var emdCardNumber = (msg[i]).emdCardNumber;
         var protocol;
         var u=0;
